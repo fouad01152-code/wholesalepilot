@@ -30,3 +30,5 @@ This extracts `wholesale-autopilot-v101/` with the complete application source, 
 Archive SHA-256: `9367c7034b7a37a5e80dc70da39e3fb97090949cbf6d5ac3edd272c4b995160b`
 
 Live service: https://wholesalepilot-live.onrender.com
+
+GitHub ↔ Render sync verified after the signup deployment.
