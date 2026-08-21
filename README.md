@@ -1,34 +1,51 @@
-# WholesalePilot
+# WholesalePilot 🚀
 
-WholesalePilot is the B2B wholesale sales workspace currently deployed on Render.
+WholesalePilot is a B2B wholesale sales workspace for buyer discovery, outreach, quotes, orders, payments, fulfillment, and sales intelligence.
 
-## Current signup flow
+## Production architecture
 
-- Create a real workspace/company
-- Enter owner name, email, and password
-- Owner account is created automatically
-- New account is logged in immediately after signup
-- Existing demo login remains available
+- 🐍 Python web application (`server.py`)
+- 🗄️ PostgreSQL in production through `DATABASE_URL`
+- 💾 SQLite fallback for local development and tests
+- ⚙️ Background outreach worker (embedded for the free beta deployment; `worker.py` can run separately later)
+- 📧 Gmail / Outlook OAuth or SMTP + IMAP
+- 💳 Stripe Checkout + manual bank-transfer confirmation
+- 🔐 Workspace-based authentication and role permissions
+
+## Run locally
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python server.py
+```
+
+Open `http://127.0.0.1:8765`.
 
 Demo login:
 
 - Email: `demo@wholesalepilot.local`
 - Password: `Demo123!`
 
-## Exact tested source snapshot
+## Database
 
-The exact tested source used for this deployment is stored in `source_bundle/part-*`.
+Production uses PostgreSQL when `DATABASE_URL` is present. The application automatically applies the current schema from `postgres_schema.sql` on startup.
 
-To reconstruct the source tree locally:
+Without `DATABASE_URL`, WholesalePilot uses local SQLite for development/testing.
+
+## Render
+
+`render.yaml` defines the intended production topology and links `wholesalepilot-live` to `wholesalepilot-db` using Render's private PostgreSQL connection string.
+
+For beta, the web service runs the outreach worker in-process (`RUN_EMBEDDED_WORKER=true`) so scheduled jobs continue without the browser being open. Move it to a dedicated Render background worker before larger-volume sending.
+
+## Tests
 
 ```bash
-python reconstruct_source.py
+python ui_wiring_audit.py
+python smoke_test.py
+python smoke_test_v10.py
 ```
 
-This extracts `wholesale-autopilot-v101/` with the complete application source, tests, deployment files, and documentation.
-
-Archive SHA-256: `9367c7034b7a37a5e80dc70da39e3fb97090949cbf6d5ac3edd272c4b995160b`
-
-Live service: https://wholesalepilot-live.onrender.com
-
-GitHub ↔ Render sync verified after the signup deployment.
+The regression suite covers authentication, buyer discovery, buyer portal, cart/quote/order, payment gating, fulfillment, campaign launch checks, background processing, SMTP delivery, and persistence.

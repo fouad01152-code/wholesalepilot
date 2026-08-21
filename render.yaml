@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: wholesalepilot-live
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    healthCheckPath: /api/runtime
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wholesalepilot-db
+          property: connectionString
+      - key: WHOLESALEPILOT_HOST
+        value: 0.0.0.0
+      - key: RUN_EMBEDDED_WORKER
+        value: true
+      - key: WORKER_POLL_SECONDS
+        value: 60
+      - key: EMAIL_AUTO_REPLY
+        value: false
+      - key: CAMPAIGN_DEFAULT_DAILY_LIMIT
+        value: 10
+      - key: CAMPAIGN_MAX_RUN_BATCH
+        value: 5
+      - key: OAUTH_TOKEN_KEY
+        generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: MICROSOFT_CLIENT_ID
+        sync: false
+      - key: MICROSOFT_CLIENT_SECRET
+        sync: false
+
+databases:
+  - name: wholesalepilot-db
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: "16"
