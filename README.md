@@ -4,17 +4,28 @@ WholesalePilot is a B2B wholesale sales workspace for buyer discovery, outreach,
 
 ## Production architecture
 
-- 🐍 Python web application (`server.py`)
+- 🐍 Python web application
 - 🗄️ PostgreSQL in production through `DATABASE_URL`
 - 💾 SQLite fallback for local development and tests
-- ⚙️ Background outreach worker (embedded for the free beta deployment; `worker.py` can run separately later)
+- ⚙️ Background outreach worker (embedded for the free beta deployment)
 - 📧 Gmail / Outlook OAuth or SMTP + IMAP
 - 💳 Stripe Checkout + manual bank-transfer confirmation
 - 🔐 Workspace-based authentication and role permissions
 
+## Source package
+
+The connector-safe repository snapshot is stored in `.source-package/part-*`. Materialize it before running the application:
+
+```bash
+python materialize_source.py
+```
+
+That reconstructs the tested application files in the repository root, including `server.py`, `worker.py`, `app.js`, `index.html`, `postgres_schema.sql`, tests, and deployment files.
+
 ## Run locally
 
 ```bash
+python materialize_source.py
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -30,9 +41,7 @@ Demo login:
 
 ## Database
 
-Production uses PostgreSQL when `DATABASE_URL` is present. The application automatically applies the current schema from `postgres_schema.sql` on startup.
-
-Without `DATABASE_URL`, WholesalePilot uses local SQLite for development/testing.
+Production uses PostgreSQL when `DATABASE_URL` is present. The application automatically applies the current schema from `postgres_schema.sql` on startup. Without `DATABASE_URL`, WholesalePilot uses local SQLite for development/testing.
 
 ## Render
 
